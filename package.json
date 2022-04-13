@@ -1,0 +1,14 @@
+{
+  "name": "eks-cicd-with-codepipeline",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "docker:build": "docker build --tag helloworld .",
+    "docker:run": "docker run -p 3000:3000 helloworld"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
