@@ -1,25 +1,53 @@
-const http = require('http');
+const express = require('express');
+const app = express();
 
-const hostname = '0.0.0.0';
+const pino = require('express-pino-logger')({
+    transport: {
+        target: 'pino-pretty',
+        options: {
+            colorize: true
+        }
+    },
+    serializers: {
+        req: (req) => ({
+            method: req.method,
+            url: req.url,
+            "user-agent": req.headers["user-agent"],
+            env: {
+                MY_NODE_NAME: process.env.MY_NODE_NAME,
+                MY_POD_NAME: process.env.MY_POD_NAME,
+                MY_POD_NAMESPACE: process.env.MY_POD_NAMESPACE,
+                MY_POD_IP: process.env.MY_POD_IP,
+                MY_POD_SERVICE_ACCOUNT: process.env.MY_POD_SERVICE_ACCOUNT
+            },
+        }),
+    },
+});
+
 const port = 3000;
 
-const server = http.createServer((req, res) => {
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'text/plain');
-    res.end('Hello World');
+//more options here - https://github.com/pinojs/express-pino-logger#example
+app.use(pino)
+
+app.get('/', (req, res) => {
+    res.send(`Hello World! from MY_POD_IP`);
+    // res.send(`Hello World! from ${process.env.MY_POD_IP}`);
 });
 
-server.listen(port, hostname, () => {
-    console.log(`Server running at http://${hostname}:${port}/`);
+app.get('/api/test', (req, res) => {
+    res.json({'message': 'Hello World from /api/test!'});
 });
 
-const signals = ["SIGTERM", "SIGINT", "SIGHUP"];
-
-const shutdown = async (signal) => {
-    console.log(`Signal received: ${signal}`);
-    process.exit(0);
-};
-
-signals.forEach((signal) => {
-    process.on(signal, shutdown);
+const server = app.listen(port, () => {
+    console.log(`Example app listening at http://localhost:${port}`);
 });
+
+const shutdown = (signalName) => () => {
+    console.log(`${signalName} - signal received: closing HTTP server`)
+    process.exit(1);
+}
+
+process.on('SIGTERM', shutdown("SIGTERM"));
+process.on('SIGINT', shutdown("SIGINT"));
+
+

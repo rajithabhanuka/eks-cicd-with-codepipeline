@@ -11,5 +11,10 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.3",
+    "express-pino-logger": "^7.0.0",
+    "pino-pretty": "^7.6.1"
+  }
 }
