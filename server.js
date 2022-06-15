@@ -30,7 +30,7 @@ const port = 3000;
 app.use(pino)
 
 app.get('/', (req, res) => {
-    // res.send(`Hello World! from BHANUKA`);
+     res.send(`Hello World! from BHANUKA`);
     res.send(`Hello World! from ${process.env.MY_POD_IP}`);
 });
 
